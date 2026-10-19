@@ -392,6 +392,19 @@
   .mapPanel p{color:var(--muted);font-size:15px;margin-top:10px}
   .mapPanel .btn{margin-top:16px;padding:10px 16px;font-size:14px}
 
+
+  /* gallery as one-row animated slider */
+  .gal-slider{position:relative}
+  .gal{display:flex!important;grid-template-columns:none;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;scroll-behavior:smooth;padding:4px 2px 14px;scrollbar-width:thin}
+  .gal::-webkit-scrollbar{height:8px}
+  .gal::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .gal>button{flex:0 0 clamp(240px,62vw,300px);scroll-snap-align:center}
+  .gal-nav{position:absolute;top:calc(50% - 7px);transform:translateY(-50%);z-index:4;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;box-shadow:var(--shadow);display:grid;place-items:center;transition:background .15s,border-color .15s}
+  .gal-nav svg{width:22px;height:22px}
+  .gal-nav:hover{background:var(--accent);color:var(--ink);border-color:var(--accent)}
+  .gal-nav.prev{left:-10px}.gal-nav.next{right:-10px}
+  @media (max-width:600px){.gal-nav{display:none}}
+
   /* footer */
   footer{background:var(--surface-2);border-top:1px solid var(--line)}
   .foot-in{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
@@ -407,7 +420,7 @@
 <div class="hud" id="hud" aria-hidden="true"><span class="hud-l">FBF · Oficiales de Medios</span><span class="hud-c">Sesión SCZ · 2026</span><span class="hud-r"><span id="hudClock">--:--:--</span> · OM</span></div>
 <div class="scrollbar" id="scrollbar" aria-hidden="true"></div>
 <div class="fbf-ring" id="fbfRing" aria-hidden="true"></div>
-<div class="fbf-cur" id="fbfCur" aria-hidden="true"><svg class="cur-ball" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#fff" stroke="#0d130f" stroke-width="2.5"/><polygon points="24,14 30.6,18.8 28.1,26.5 19.9,26.5 17.4,18.8" fill="#0d130f"/><g fill="none" stroke="#0d130f" stroke-width="2.4" stroke-linecap="round"><path d="M24 4.5V14"/><path d="M17.4 18.8L9 15.6"/><path d="M30.6 18.8L39 15.6"/><path d="M19.9 26.5L13.5 34.5"/><path d="M28.1 26.5L34.5 34.5"/></g></svg><img class="cur-shield" src="logo-fbf.png" alt=""></div>
+<div class="fbf-cur" id="fbfCur" aria-hidden="true"><svg class="cur-ball" viewBox="0 0 48 48"><defs><radialGradient id="fbfball" cx="38%" cy="32%" r="72%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#cfd6cb"/></radialGradient><clipPath id="fbfclip"><circle cx="24" cy="24" r="20.2"/></clipPath></defs><circle cx="24" cy="24" r="21" fill="url(#fbfball)" stroke="#0d130f" stroke-width="2"/><g clip-path="url(#fbfclip)"><g stroke="#0d130f" stroke-width="1.5" fill="none" stroke-linecap="round"><line x1="24.0" y1="16.8" x2="24.0" y2="5.7"/><line x1="30.8" y1="21.8" x2="41.4" y2="18.3"/><line x1="28.2" y1="29.8" x2="34.8" y2="38.8"/><line x1="19.8" y1="29.8" x2="13.2" y2="38.8"/><line x1="17.2" y1="21.8" x2="6.6" y2="18.3"/></g><polygon points="24.0,16.8 30.8,21.8 28.2,29.8 19.8,29.8 17.2,21.8" fill="#0d130f"/><polygon points="24.0,0.1 29.3,4.0 27.3,10.2 20.7,10.2 18.7,4.0" fill="#0d130f"/><polygon points="46.7,16.6 44.7,22.9 38.1,22.9 36.1,16.6 41.4,12.7" fill="#0d130f"/><polygon points="38.0,43.3 31.5,43.3 29.4,37.1 34.8,33.2 40.1,37.1" fill="#0d130f"/><polygon points="10.0,43.3 7.9,37.1 13.2,33.2 18.6,37.1 16.5,43.3" fill="#0d130f"/><polygon points="1.3,16.6 6.6,12.7 11.9,16.6 9.9,22.9 3.3,22.9" fill="#0d130f"/></g></svg><img class="cur-shield" src="logo-fbf.png" alt=""></div>
 <nav class="nav">
   <div class="wrap nav-in">
     <a class="logo" href="#top">
@@ -682,9 +695,9 @@
 <section id="diapositivas" class="alt">
   <div class="wrap">
     <div class="sec-head">
-      <div class="mod">Presentación original</div>
-      <h2>Las 100 diapositivas</h2>
-      <p>La presentación completa del workshop, con su tipografía y fotografías originales. Toca cualquier diapositiva para abrirla: podrás hacer zoom, saltar con la tira de miniaturas o activar la reproducción automática.</p>
+      <div class="mod">Presentación</div>
+      <h2>Manual 2026 · Módulos</h2>
+      <p>Recorre las diapositivas del workshop como un slider: filtra por módulo o busca por contenido, y toca cualquiera para abrirla en grande con zoom.</p>
     </div>
     <div class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -692,7 +705,11 @@
       <div class="cnt" id="galleryCount" aria-live="polite"></div>
     </div>
     <div class="galbar" id="galbar"></div>
-    <div class="gal" id="gal"></div>
+    <div class="gal-slider">
+      <button class="gal-nav prev" id="galPrev" aria-label="Anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="gal" id="gal"></div>
+      <button class="gal-nav next" id="galNext" aria-label="Siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
   </div>
 </section>
 
@@ -1025,6 +1042,24 @@
       g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){sel(g.getAttribute("data-id"));e.preventDefault()}});
     });
     sel("tribuna");
+  })();
+
+
+  /* ---- gallery slider nav + autoplay ---- */
+  (function(){
+    var g=document.getElementById("gal"); if(!g) return;
+    var pv=document.getElementById("galPrev"), nx=document.getElementById("galNext");
+    function step(){return Math.max(g.clientWidth*0.85,260)}
+    if(pv)pv.onclick=function(){g.scrollBy({left:-step(),behavior:"smooth"})};
+    if(nx)nx.onclick=function(){g.scrollBy({left:step(),behavior:"smooth"})};
+    var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches, hover=false;
+    g.addEventListener("mouseenter",function(){hover=true});
+    g.addEventListener("mouseleave",function(){hover=false});
+    if(!reduce){ setInterval(function(){
+      if(hover||galQuery||document.hidden) return;
+      if(g.scrollLeft+g.clientWidth>=g.scrollWidth-6){ g.scrollTo({left:0,behavior:"smooth"}); }
+      else { g.scrollBy({left:step(),behavior:"smooth"}); }
+    },3600); }
   })();
 
 })();

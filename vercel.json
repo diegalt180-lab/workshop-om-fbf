@@ -7,10 +7,10 @@
       ]
     },
     {
-      "source": "/manual-oficiales-medios-fbf-2027.pdf",
+      "source": "/manual-om-fbf-2027-7k9x2a4z.pdf",
       "headers": [
         { "key": "Content-Disposition", "value": "attachment; filename=\"Manual-Oficiales-de-Medios-FBF-2027.pdf\"" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
+        { "key": "Cache-Control", "value": "no-store" }
       ]
     }
   ]

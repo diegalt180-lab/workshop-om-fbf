@@ -426,6 +426,24 @@
   .card.revealed .card-reveal{max-height:300px;margin-top:14px}
   .card-reveal img{width:100%;display:block;border-radius:10px;border:1px solid var(--line)}
 
+
+  /* request manual modal */
+  .modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(6,12,8,.62);padding:16px}
+  .modal.open{display:flex}
+  .modal-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);width:min(440px,100%);padding:26px;position:relative}
+  .modal-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;font-size:15px}
+  .modal-x:hover{border-color:var(--accent)}
+  .modal-card h3{font-size:22px}
+  .modal-sub{color:var(--muted);font-size:14.5px;margin-top:8px}
+  #reqForm{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+  #reqForm label{display:flex;flex-direction:column;gap:5px;font-family:var(--fdisp);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  #reqForm input{font-family:var(--fbody);font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;text-transform:none;letter-spacing:0}
+  #reqForm input:focus{outline:none;border-color:var(--accent)}
+  #reqSubmit{margin-top:6px;justify-content:center}
+  .modal-msg{font-size:14px;min-height:1em}
+  .modal-msg.ok{color:var(--accent)}
+  .modal-msg.err{color:var(--red)}
+
   /* footer */
   footer{background:var(--surface-2);border-top:1px solid var(--line)}
   .foot-in{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
@@ -477,7 +495,7 @@
       <div class="cta">
         <a class="btn primary" href="#rol">Comenzar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <a class="btn" href="#diapositivas">Ver diapositivas</a>
-        <a class="btn" href="manual-oficiales-medios-fbf-2027.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg> Descargar manual</a>
+        <button class="btn" type="button" id="reqManualBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H5.2L4 17.5z"/><path d="M8 9h8M8 12h5"/></svg> Solicitar manual</button>
       </div>
     </div>
     <div class="hero-card" id="heroCard" role="button" tabindex="0" aria-label="Abrir presentación">
@@ -757,7 +775,7 @@
         <p>Federación Boliviana de Fútbol · Cochabamba 2026</p>
       </div>
     </div>
-    <small>Facilitador: Msc. Lic. Diego Mauricio Altamirano Vega · Contenido operativo basado en los manuales CONMEBOL. · <a href="manual-oficiales-medios-fbf-2027.pdf" download style="color:var(--accent);font-weight:600">Descargar Manual para Oficiales de Medios (PDF)</a></small>
+    <small>Facilitador: Msc. Lic. Diego Mauricio Altamirano Vega · Contenido operativo basado en los manuales CONMEBOL. · <a href="#solicitar" id="reqManualFoot" style="color:var(--accent);font-weight:600">Solicitar el Manual para Oficiales de Medios (PDF)</a></small>
   </div>
 </footer>
 
@@ -1116,7 +1134,47 @@
     });
   })();
 
+
+  /* ---- request manual modal (Web3Forms) ---- */
+  (function(){
+    var m=document.getElementById("reqModal"); if(!m) return;
+    function open(e){if(e)e.preventDefault();m.classList.add("open");document.body.style.overflow="hidden";var i=m.querySelector("input[name=name]");if(i)i.focus();}
+    function close(){m.classList.remove("open");document.body.style.overflow="";}
+    var b1=document.getElementById("reqManualBtn"); if(b1)b1.addEventListener("click",open);
+    var b2=document.getElementById("reqManualFoot"); if(b2)b2.addEventListener("click",open);
+    document.getElementById("reqClose").addEventListener("click",close);
+    m.addEventListener("click",function(e){if(e.target===m)close()});
+    document.addEventListener("keydown",function(e){if(e.key==="Escape"&&m.classList.contains("open"))close()});
+    var f=document.getElementById("reqForm"), msg=document.getElementById("reqMsg"), sub=document.getElementById("reqSubmit");
+    f.addEventListener("submit",function(e){
+      e.preventDefault();
+      if(f.botcheck&&f.botcheck.checked) return;
+      msg.className="modal-msg"; msg.textContent=""; sub.disabled=true; sub.textContent="Enviando…";
+      var data={access_key:"5ce2db50-3a6d-4828-9464-c26f0f0b253e",subject:"Solicitud de Manual OM — "+(f.name.value||""),from_name:"Workshop OM FBF",name:f.name.value,email:f.email.value,medio:f.medio.value};
+      fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(data)})
+        .then(function(r){return r.json()})
+        .then(function(j){ if(j.success){ f.reset(); msg.className="modal-msg ok"; msg.textContent="¡Solicitud enviada! Te contactaremos a tu correo con el manual."; } else { msg.className="modal-msg err"; msg.textContent="No se pudo enviar. Intenta de nuevo."; } })
+        .catch(function(){ msg.className="modal-msg err"; msg.textContent="No se pudo enviar. Revisa tu conexión e intenta de nuevo."; })
+        .finally(function(){ sub.disabled=false; sub.textContent="Enviar solicitud"; });
+    });
+  })();
+
 })();
 </script>
+<div class="modal" id="reqModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
+    <button class="modal-x" id="reqClose" aria-label="Cerrar">✕</button>
+    <h3 id="reqTitle">Solicitar el Manual</h3>
+    <p class="modal-sub">Déjanos tus datos y te enviaremos el Manual para Oficiales de Medios (edición 2027) a tu correo.</p>
+    <form id="reqForm">
+      <label>Nombre y apellido<input name="name" required></label>
+      <label>Correo<input name="email" type="email" required></label>
+      <label>Medio / motivo<input name="medio" placeholder="Opcional"></label>
+      <input type="checkbox" name="botcheck" tabindex="-1" style="display:none" aria-hidden="true">
+      <button class="btn primary" type="submit" id="reqSubmit">Enviar solicitud</button>
+      <div class="modal-msg" id="reqMsg" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
 </body>
 </html>

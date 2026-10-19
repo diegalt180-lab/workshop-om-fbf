@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Acceso · Workshop OM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:"Barlow",system-ui,sans-serif;color:#e9efe6;
+    background:radial-gradient(120% 90% at 50% 30%,#133a22,#0a140d 70%);
+    display:grid;place-items:center;padding:20px}
+  .card{width:min(400px,100%);background:#141c16;border:1px solid #273327;border-radius:16px;
+    box-shadow:0 18px 48px -18px rgba(0,0,0,.65);padding:34px;text-align:center}
+  .crest{width:66px;height:66px;margin:0 auto 18px;border-radius:14px;
+    background:linear-gradient(145deg,#0b7a3b,#0a5e2e);display:grid;place-items:center;
+    color:#fff;font-family:"Barlow Semi Condensed",sans-serif;font-weight:800;font-size:24px;letter-spacing:.5px;
+    box-shadow:0 10px 26px -8px rgba(11,122,59,.6);border:1px solid rgba(255,255,255,.14)}
+  h1{font-family:"Barlow Semi Condensed",sans-serif;font-weight:800;font-size:26px;margin:0}
+  p{color:#9db0a1;font-size:14.5px;margin:10px 0 0}
+  .gbtn{display:inline-flex;align-items:center;justify-content:center;gap:11px;width:100%;margin-top:24px;
+    font-family:"Barlow Semi Condensed",sans-serif;font-weight:700;font-size:16px;color:#1f2a22;text-decoration:none;
+    background:#fff;border:1px solid #d9dfd2;border-radius:11px;padding:13px;transition:filter .15s}
+  .gbtn:hover{filter:brightness(.96)}
+  .gbtn svg{width:20px;height:20px;flex:0 0 auto}
+  .msg{min-height:1.2em;font-size:14px;margin-top:16px;color:#e3685a}
+  .foot{margin-top:18px;font-size:12px;color:#5c6b5f}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="crest">FBF</div>
+    <h1>Acceso restringido</h1>
+    <p>Workshop de Oficiales de Medios. Ingresá con tu cuenta de Google autorizada.</p>
+    <a class="gbtn" href="/api/auth/login">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.5 0 24 0 14.6 0 6.4 5.4 2.5 13.2l7.9 6.1C12.3 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-2.8-.4-4.1H24v7.7h12.4c-.3 2-1.6 5-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16.1z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.3 0 20 0 24s.9 7.7 2.5 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.1-5.5c-1.9 1.3-4.5 2.3-8.8 2.3-6.4 0-11.7-3.7-13.6-9l-7.9 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
+      Ingresar con Google
+    </a>
+    <div class="msg" id="m"></div>
+    <div class="foot">Federación Boliviana de Fútbol</div>
+  </div>
+<script>
+  var e=new URLSearchParams(location.search).get("e");
+  if(e==="2"){document.getElementById("m").textContent="Tu correo no está autorizado para este sitio.";}
+  else if(e==="1"){document.getElementById("m").textContent="No se pudo completar el acceso. Intentá de nuevo.";}
+</script>
+</body>
+</html>

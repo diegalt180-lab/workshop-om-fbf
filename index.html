@@ -320,6 +320,25 @@
   @media (prefers-reduced-motion:reduce){.hero::before,.hero::after,.alt::before,.hero h1 em,.fbf-cur{animation:none}.fbf-cur,.fbf-ring{display:none}}
   @media (hover:none),(pointer:coarse){.fbf-cur,.fbf-ring{display:none!important}}
 
+
+  /* photo marquee (reemplaza la franja de datos) */
+  .marquee{overflow:hidden;background:var(--accent-2);border-block:1px solid var(--line);padding-block:16px;position:relative}
+  .marquee::before,.marquee::after{content:"";position:absolute;top:0;bottom:0;width:70px;z-index:2;pointer-events:none}
+  .marquee::before{left:0;background:linear-gradient(90deg,var(--accent-2),transparent)}
+  .marquee::after{right:0;background:linear-gradient(270deg,var(--accent-2),transparent)}
+  .marquee-track{display:flex;gap:14px;width:max-content;animation:marq 50s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  .marquee-track img{height:124px;width:auto;aspect-ratio:16/9;object-fit:cover;border-radius:11px;border:1px solid rgba(255,255,255,.16);box-shadow:var(--shadow);flex:0 0 auto}
+  @keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media (max-width:560px){.marquee-track img{height:92px}}
+  @media (prefers-reduced-motion:reduce){.marquee-track{animation:none;overflow-x:auto;max-width:100%}}
+  /* roadmap panel with supporting photo */
+  .rm-panel.has-img{display:grid;grid-template-columns:1.12fr .88fr;gap:22px;align-items:start}
+  .rm-col{min-width:0}
+  .rm-figure{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#000;aspect-ratio:16/9}
+  .rm-figure img{width:100%;height:100%;object-fit:cover;display:block}
+  @media (max-width:760px){.rm-panel.has-img{grid-template-columns:1fr}}
+
   /* footer */
   footer{background:var(--surface-2);border-top:1px solid var(--line)}
   .foot-in{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
@@ -376,14 +395,7 @@
   </div>
 </header>
 
-<div class="stats">
-  <div class="wrap stats-in">
-    <div class="stat"><b>7<span class="g">ª</span></b><span>versión del rol en CONMEBOL</span></div>
-    <div class="stat"><b>KO‑5h</b><span>llegada mínima del OM</span></div>
-    <div class="stat"><b>30+</b><span>medios en Zona Mixta</span></div>
-    <div class="stat"><b>3</b><span>oficiales: OMC · BVM · CVM</span></div>
-  </div>
-</div>
+<div class="marquee" aria-label="Imágenes del workshop"><div class="marquee-track" id="mtrack"></div></div>
 
 <!-- ===== MÓDULO 1 — EL ROL ===== -->
 <section id="rol">
@@ -742,6 +754,14 @@
   hc.addEventListener("click",function(){openLb(1)});
   hc.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){openLb(1);e.preventDefault()}});
 
+  /* ---- photo marquee ---- */
+  (function(){
+    var track=document.getElementById("mtrack"); if(!track) return;
+    var P=[["oficiales","Oficiales de partido"],["sala-trabajo","Sala de trabajo de prensa"],["tribuna","Tribuna de prensa"],["reunion","Reunión de coordinación"],["entrevista","Entrevista / Flash"],["zona-mixta","Zona Mixta"],["flash","Jugador del partido"],["trofeos","Workshop de oficiales"]];
+    var h=P.map(function(p){return '<img src="photos/'+p[0]+'.jpg" alt="'+p[1]+'" loading="lazy">'}).join("");
+    track.innerHTML=h+h;
+  })();
+
   /* ---- roadmap: horizontal interactive stepper ---- */
   var STEPS=[
     {tag:"KO − 7 días · Días previos",lbl:"Días previos",title:"Designación y contactos",desc:"El OM se presenta al Delegado, al CVM y al BVM para coordinar temas operacionales, y formalmente a los Jefes de Prensa.",sub:["Informar el proceso de acreditaciones (club local).","El club local publica la convocatoria de acreditación con el texto y link oficiales.","El JP comparte el link de la convocatoria con el OM el mismo día."]},
@@ -752,18 +772,22 @@
     {tag:"Durante el partido",lbl:"Monitoreo",title:"Monitoreo en las áreas de prensa",desc:"El OM se ubica preferentemente en la tribuna de prensa; no permanece todo el juego en el banco de oficiales.",sub:["FOP: ningún fotógrafo dentro de las 4 líneas.","Tribuna: verificar internet y que nadie grabe o transmita (prohibido a NHR).","Min. 70: última verificación de sala de conferencia y Zona Mixta.","Min. 80: encuentro con los JP en campo y coordinación con el BVM."]},
     {tag:"Post‑partido",lbl:"Post‑partido",title:"Flash, Hero of the Match y conferencia",desc:"Desde el minuto 80 el OM coordina el ingreso al FOP con HB/BVM y los JP. Hasta 3 jugadores por equipo para los RH; comunica al JP a quién entrevistar.",sub:["Hero of the Match (HOTM): se comunica al JP para la entrevista con la HB y la entrega del premio.","Conferencia: obligatoria la presencia del DT. Orden: visitante, luego local. El JP modera, no el OM.","Zona Mixta: todos los jugadores pasan. Expulsados y suspendidos no participan de ninguna actividad de prensa."]}
   ];
+  var STEP_IMG={0:"photos/oficiales.jpg",1:"photos/sala-trabajo.jpg",3:"photos/tribuna.jpg",4:"photos/reunion.jpg",5:"photos/flash.jpg",6:"photos/entrevista.jpg"};
+  STEPS.forEach(function(st,i){if(STEP_IMG[i])st.img=STEP_IMG[i]});
   var rmTrack=document.getElementById("rmTrack"), rmPanel=document.getElementById("rmPanel"), rmCur=0, rmBtns=[];
   if(rmTrack&&rmPanel){
     function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
     function rmRender(){
       var s=STEPS[rmCur];
       var sub=s.sub?('<div class="rm-sub">'+s.sub.map(function(x){return "<div>"+esc(x)+"</div>"}).join("")+'</div>'):"";
-      rmPanel.innerHTML='<div class="when">'+esc(s.tag)+'</div><h3>'+esc(s.title)+'</h3><p>'+esc(s.desc)+'</p>'+sub+
-        '<div class="rm-foot"><button class="btn" id="rmPrev">← Anterior</button><span class="rm-count">'+(rmCur+1)+' / '+STEPS.length+'</span><button class="btn primary" id="rmNext">Siguiente →</button></div>';
+      var foot='<div class="rm-foot"><button class="btn" id="rmPrev">← Anterior</button><span class="rm-count">'+(rmCur+1)+' / '+STEPS.length+'</span><button class="btn primary" id="rmNext">Siguiente →</button></div>';
+      var body='<div class="when">'+esc(s.tag)+'</div><h3>'+esc(s.title)+'</h3><p>'+esc(s.desc)+'</p>'+sub+foot;
+      if(s.img){rmPanel.className="rm-panel has-img";rmPanel.innerHTML='<div class="rm-col">'+body+'</div><figure class="rm-figure"><img src="'+s.img+'" alt="'+esc(s.title)+'" loading="lazy"></figure>';}
+      else{rmPanel.className="rm-panel";rmPanel.innerHTML=body;}
       rmBtns.forEach(function(b,i){b.classList.toggle("active",i===rmCur);b.classList.toggle("done",i<rmCur);if(i===rmCur)b.setAttribute("aria-selected","true");else b.removeAttribute("aria-selected")});
       document.getElementById("rmPrev").onclick=function(){rmGo(rmCur-1)};
       document.getElementById("rmNext").onclick=function(){rmGo(rmCur+1)};
-      rmPanel.classList.remove("flash"); void rmPanel.offsetWidth; rmPanel.classList.add("flash");
+      void rmPanel.offsetWidth; rmPanel.classList.add("flash");
     }
     function rmGo(i){ rmCur=(i<0)?0:(i>=STEPS.length?STEPS.length-1:i); rmRender(); if(rmBtns[rmCur])rmBtns[rmCur].scrollIntoView({inline:"center",block:"nearest"}); }
     STEPS.forEach(function(s,i){

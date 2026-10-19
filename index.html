@@ -466,6 +466,25 @@
   .q.answered .q-exp{display:block}
   .q-exp b{color:var(--fg)}
 
+
+  /* quiz one-at-a-time */
+  .quiz{max-width:720px}
+  .quiz-start,.quiz-results{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);text-align:center}
+  .quiz-start h3,.quiz-results h3{font-size:24px}
+  .quiz-start p{color:var(--muted);margin-top:10px;font-size:15px}
+  .quiz-start .btn{margin-top:20px}
+  .quiz-prog{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .quiz-prog .lbl{font-family:var(--fdisp);font-weight:700;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .quiz-prog .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+  .quiz-prog .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .3s}
+  .q-foot{display:flex;justify-content:flex-end;margin-top:16px}
+  .quiz-results .score-big{font-family:var(--fdisp);font-weight:800;font-size:48px;color:var(--accent);line-height:1}
+  .quiz-results .verdict{font-family:var(--fdisp);font-weight:700;font-size:19px;margin-top:8px}
+  .quiz-results .verdict.ok{color:var(--accent)}
+  .quiz-results .verdict.mid{color:var(--gold)}
+  .quiz-results .verdict.low{color:var(--red)}
+  .quiz-results .btn{margin-top:20px}
+
   /* footer */
   footer{background:var(--surface-2);border-top:1px solid var(--line)}
   .foot-in{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
@@ -743,11 +762,7 @@
     <div class="sec-head">
       <div class="mod">Evaluación</div>
       <h2>Pon a prueba tu criterio</h2>
-      <p>Preguntas de aplicación basadas en el protocolo del OM — no son de memoria, hay que razonar cada caso. Elegí una opción para ver la respuesta correcta y su explicación.</p>
-    </div>
-    <div class="quiz-top">
-      <div class="quiz-score" id="quizScore">0 / 0 correctas</div>
-      <button class="btn" id="quizReset" type="button">Reiniciar test</button>
+      <p>Preguntas de aplicación basadas en el protocolo del OM — no son de memoria, hay que razonar cada caso. Se responde una por una, con explicación al elegir.</p>
     </div>
     <div class="quiz" id="quiz"></div>
   </div>
@@ -1233,28 +1248,38 @@
       {q:"¿A qué hora, como mínimo, debe llegar el OM al estadio el día del partido (MD)?",o:["KO-2h","KO-3h","KO-5h","KO-7h"],c:2,e:"<b>Correcta: C.</b> El OM debe llegar al estadio al menos a KO-5h. La reunión de coordinación suele ser hacia las 11:00, donde se definen filmaciones, llegadas, Flash, Zona Mixta y conferencia."},
       {q:"Un jugador fue SUSPENDIDO para este partido pero viajó con la delegación. ¿Puede participar de actividades de prensa en el estadio ese día?",o:["Sí, si el club lo autoriza","Sí, solo en Zona Mixta","No puede participar de ninguna actividad de prensa en el estadio ese día","Solo en la conferencia de prensa"],c:2,e:"<b>Correcta: C.</b> Jugadores y oficiales expulsados y/o suspendidos no pueden participar de ninguna actividad de prensa en el estadio el día del partido."}
     ];
-    var correct=0, total=QUIZ.length;
-    function updateScore(){ scoreEl.innerHTML="<b>"+correct+"</b> / "+total+" correctas"; }
-    function render(){
-      correct=0; box.innerHTML=""; updateScore();
-      QUIZ.forEach(function(item,qi){
-        var q=document.createElement("div"); q.className="q";
-        var opts=item.o.map(function(t,oi){return '<button class="q-opt" type="button" data-i="'+oi+'"><span class="k">'+String.fromCharCode(65+oi)+'</span><span>'+t+'</span></button>';}).join("");
-        q.innerHTML='<div class="qn">Pregunta '+(qi+1)+' de '+total+'</div><h3>'+item.q+'</h3><div class="q-opts">'+opts+'</div><div class="q-exp">'+item.e+'</div>';
-        var btns=[].slice.call(q.querySelectorAll(".q-opt"));
-        btns.forEach(function(b){ b.addEventListener("click",function(){
-          if(q.classList.contains("answered"))return;
-          q.classList.add("answered");
-          var i=parseInt(b.getAttribute("data-i"),10);
-          btns[item.c].classList.add("correct");
-          if(i!==item.c)b.classList.add("wrong");
-          if(i===item.c)correct++; updateScore();
-        }); });
-        box.appendChild(q);
-      });
+    function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+    var order, correct, idx;
+    function start(){ order=shuffle(QUIZ.map(function(_,i){return i;})); correct=0; idx=-1; renderStart(); }
+    function renderStart(){
+      box.innerHTML='<div class="quiz-start"><h3>Test del Oficial de Medios</h3><p>'+QUIZ.length+' preguntas de aplicaci\u00f3n. Una por vez, con explicaci\u00f3n al responder.</p><button class="btn primary" id="qStart" type="button">Comenzar test</button></div>';
+      document.getElementById("qStart").onclick=function(){idx=0;renderQ();};
     }
-    document.getElementById("quizReset").addEventListener("click",render);
-    render();
+    function renderQ(){
+      var item=QUIZ[order[idx]];
+      var opts=shuffle(item.o.map(function(t,i){return {t:t,c:i===item.c};}));
+      var prog=Math.round(idx/QUIZ.length*100);
+      var html='<div class="quiz-prog"><div class="lbl">Pregunta '+(idx+1)+' de '+QUIZ.length+'</div><div class="bar"><i style="width:'+prog+'%"></i></div></div>';
+      html+='<div class="q"><h3>'+item.q+'</h3><div class="q-opts">'+opts.map(function(o,i){return '<button class="q-opt" type="button" data-c="'+(o.c?1:0)+'"><span class="k">'+String.fromCharCode(65+i)+'</span><span>'+o.t+'</span></button>';}).join('')+'</div><div class="q-exp">'+item.e+'</div><div class="q-foot"></div></div>';
+      box.innerHTML=html;
+      var qEl=box.querySelector('.q'), btns=[].slice.call(box.querySelectorAll('.q-opt'));
+      btns.forEach(function(b){ b.addEventListener('click',function(){
+        if(qEl.classList.contains('answered'))return;
+        qEl.classList.add('answered');
+        btns.forEach(function(x){ if(x.getAttribute('data-c')==='1')x.classList.add('correct'); });
+        var ok=b.getAttribute('data-c')==='1'; if(!ok)b.classList.add('wrong'); if(ok)correct++;
+        var last=idx>=QUIZ.length-1;
+        box.querySelector('.q-foot').innerHTML='<button class="btn primary" id="qNext" type="button">'+(last?'Ver resultados':'Siguiente \u2192')+'</button>';
+        document.getElementById('qNext').onclick=function(){ if(last)renderResults(); else {idx++;renderQ();} };
+      }); });
+    }
+    function renderResults(){
+      var pct=Math.round(correct/QUIZ.length*100);
+      var v=pct>=80?['ok','Apto \u2014 excelente criterio']:(pct>=60?['mid','Aprobado \u2014 repasa algunos puntos']:['low','A reforzar \u2014 revisa el manual']);
+      box.innerHTML='<div class="quiz-results"><div class="score-big">'+correct+' / '+QUIZ.length+'</div><div class="verdict '+v[0]+'">'+v[1]+'</div><p style="color:var(--muted);margin-top:10px">'+pct+'% de respuestas correctas.</p><button class="btn primary" id="qRestart" type="button">Reiniciar test</button></div>';
+      document.getElementById('qRestart').onclick=start;
+    }
+    start();
   })();
 
 })();

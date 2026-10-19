@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Acceso · Workshop OM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:"Barlow",system-ui,sans-serif;color:#e9efe6;
+    background:radial-gradient(120% 90% at 50% 30%,#133a22,#0a140d 70%);
+    display:grid;place-items:center;padding:20px}
+  .card{width:min(400px,100%);background:#141c16;border:1px solid #273327;border-radius:16px;
+    box-shadow:0 18px 48px -18px rgba(0,0,0,.65);padding:32px;text-align:center}
+  .crest{width:66px;height:66px;margin:0 auto 18px;border-radius:14px;
+    background:linear-gradient(145deg,#0b7a3b,#0a5e2e);display:grid;place-items:center;
+    color:#fff;font-family:"Barlow Semi Condensed",sans-serif;font-weight:800;font-size:24px;letter-spacing:.5px;
+    box-shadow:0 10px 26px -8px rgba(11,122,59,.6);border:1px solid rgba(255,255,255,.14)}
+  h1{font-family:"Barlow Semi Condensed",sans-serif;font-weight:800;font-size:26px;margin:0}
+  p{color:#9db0a1;font-size:14.5px;margin:10px 0 0}
+  form{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+  input{font-family:"Barlow",sans-serif;font-size:16px;text-align:center;letter-spacing:.06em;color:#e9efe6;
+    background:#0e140f;border:1px solid #273327;border-radius:11px;padding:13px 14px}
+  input:focus{outline:none;border-color:#34b369}
+  button{font-family:"Barlow Semi Condensed",sans-serif;font-weight:800;font-size:16px;letter-spacing:.03em;
+    background:#0b7a3b;color:#fff;border:0;border-radius:11px;padding:13px;cursor:pointer;transition:background .15s}
+  button:hover{background:#0a5e2e}
+  button:disabled{opacity:.6;cursor:default}
+  .msg{min-height:1.2em;font-size:14px;margin-top:4px}
+  .msg.err{color:#e3685a}
+  .foot{margin-top:18px;font-size:12px;color:#5c6b5f}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="crest">FBF</div>
+    <h1>Acceso restringido</h1>
+    <p>Workshop de Oficiales de Medios. Ingresá el código de acceso que te compartieron.</p>
+    <form id="f">
+      <input id="code" name="code" type="password" inputmode="text" autocomplete="off" placeholder="Código de acceso" required autofocus>
+      <button id="b" type="submit">Entrar</button>
+      <div class="msg" id="m" aria-live="polite"></div>
+    </form>
+    <div class="foot">Federación Boliviana de Fútbol</div>
+  </div>
+<script>
+  var f=document.getElementById("f"),code=document.getElementById("code"),b=document.getElementById("b"),m=document.getElementById("m");
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    m.className="msg"; m.textContent=""; b.disabled=true; b.textContent="Verificando…";
+    fetch("/api/acceso",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code.value})})
+      .then(function(r){return r.json().catch(function(){return{ok:false}})})
+      .then(function(j){
+        if(j && j.ok){ b.textContent="¡Listo!"; location.href="/"; }
+        else { m.className="msg err"; m.textContent="Código incorrecto."; b.disabled=false; b.textContent="Entrar"; code.select(); }
+      })
+      .catch(function(){ m.className="msg err"; m.textContent="No se pudo verificar. Intentá de nuevo."; b.disabled=false; b.textContent="Entrar"; });
+  });
+</script>
+</body>
+</html>

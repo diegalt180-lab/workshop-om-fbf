@@ -339,6 +339,28 @@
   .rm-figure img{width:100%;height:100%;object-fit:cover;display:block}
   @media (max-width:760px){.rm-panel.has-img{grid-template-columns:1fr}}
 
+
+  /* operations card photo */
+  .card{overflow:hidden}
+  .card-ph{width:calc(100% + 48px);height:150px;object-fit:cover;margin:-24px -24px 16px;display:block;border-bottom:1px solid var(--line)}
+  /* intro loader */
+  .loader{position:fixed;inset:0;z-index:10000;background:radial-gradient(circle at 50% 38%,#10311d,#0a140d 70%);display:grid;place-items:center;transition:opacity .55s ease}
+  .loader.done{opacity:0;pointer-events:none}
+  .loader-box{display:flex;flex-direction:column;align-items:center;gap:16px;width:min(300px,76vw);text-align:center}
+  .loader-logo{width:92px;height:92px;object-fit:contain;filter:drop-shadow(0 6px 22px rgba(47,174,99,.55));animation:lpulse 1.4s ease-in-out infinite}
+  @keyframes lpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  .loader-bar{width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
+  .loader-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .1s linear}
+  .loader-pct{font-family:var(--fdisp);font-weight:800;font-size:22px;color:#fff;font-variant-numeric:tabular-nums}
+  .loader-txt{font-family:var(--fbody);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#9db0a1}
+  /* HUD status bar */
+  .hud{position:fixed;left:0;right:0;bottom:0;z-index:58;pointer-events:none;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:5px max(14px,env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));font-family:var(--fbody);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--fg) 68%,transparent);background:linear-gradient(to top,color-mix(in srgb,var(--bg) 94%,transparent),transparent)}
+  .hud .hud-c{opacity:.8}
+  .hud .hud-r{font-variant-numeric:tabular-nums;color:var(--accent)}
+  @media (max-width:620px){.hud .hud-c{display:none}}
+  footer .foot-in{padding-bottom:46px}
+  @media (prefers-reduced-motion:reduce){.loader-logo{animation:none}}
+
   /* footer */
   footer{background:var(--surface-2);border-top:1px solid var(--line)}
   .foot-in{padding-block:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
@@ -349,6 +371,8 @@
 </head>
 <body>
 
+<div id="loader" class="loader" aria-hidden="true"><div class="loader-box"><img src="logo-fbf.png" alt="FBF" class="loader-logo"><div class="loader-bar"><div class="loader-fill" id="loaderFill"></div></div><div class="loader-pct" id="loaderPct">0%</div><div class="loader-txt">Cargando · FBF Oficiales de Medios</div></div></div>
+<div class="hud" id="hud" aria-hidden="true"><span class="hud-l">FBF · Oficiales de Medios</span><span class="hud-c">Sesión SCZ · 2026</span><span class="hud-r"><span id="hudClock">--:--:--</span> · OM</span></div>
 <div class="scrollbar" id="scrollbar" aria-hidden="true"></div>
 <div class="fbf-ring" id="fbfRing" aria-hidden="true"></div>
 <div class="fbf-cur" id="fbfCur" aria-hidden="true"><img src="logo-fbf.png" alt=""></div>
@@ -542,14 +566,14 @@
 
     <div class="galbar" id="opTabs"></div>
     <div class="grid g3" id="opGrid">
-      <div class="card"><span class="tag">Previa</span><h3 style="margin-top:12px">Filmación de vestuarios</h3><p>Solo HB y Digital CONMEBOL, antes de que lleguen los jugadores y en el horario de la reunión de coordinación. El CVM garantiza el vestuario limpio y con productos del patrocinador. Prohibida la presencia de RH; la HB entrega el material.</p></div>
-      <div class="card"><span class="tag">Previa</span><h3 style="margin-top:12px">Llegada de los equipos</h3><p>La HB registra desde el ómnibus hasta el ingreso a vestuarios (≈10 min entre llegadas). El CVM lleva el backdrop al punto acordado; el BVM y el OSC aseguran una toma limpia. Las TV y redes de clubes graban siempre detrás de la HB.</p></div>
-      <div class="card"><span class="tag">Previa</span><h3 style="margin-top:12px">Entrevista DT y jugador</h3><p>En la llegada, solo por la HB, tras el ingreso a vestuarios. Máximo 3 minutos, backdrop obligatorio. El BVM chequea posición, micrófono, iluminación y sonido; avisa al OMC para traer al DT y al jugador.</p></div>
-      <div class="card"><span class="tag">Partido</span><h3 style="margin-top:12px">Protocolo de inicio</h3><p>Se cumple la cuenta regresiva tal cual. El BVM ensaya con HB y CVM pórtico, portapelota y carteles, y coordina la marcación de árbitros y el sorteo con el delegado. El OMC lleva la operación de cuerda.</p></div>
-      <div class="card"><span class="tag">Post</span><h3 style="margin-top:12px">Flash Interview</h3><p>Inmediatamente al final: la HB primero, luego los RH (hasta 3 jugadores por equipo, 60 s cada uno). Backdrop obligatorio y reportero fuera de plano. El BVM organiza prioridades; el CVM entrega el BOTM.</p></div>
-      <div class="card"><span class="tag">Post</span><h3 style="margin-top:12px">Conferencia de prensa</h3><p>Máx. 15‑20 min tras el partido, con DT y un jugador. Orden: visitante y luego local. El OMC chequea la sala con el club; el CVM, el backdrop y que el espacio esté libre de marcas.</p></div>
-      <div class="card"><span class="tag">Post</span><h3 style="margin-top:12px">Zona Mixta</h3><p>Dividida en TV (RH y NHR, con backdrop) y prensa escrita / radios. Prioridad <em>first come, first served</em>, siempre con prioridad RH. Los NHR no hacen vivo: todo su material es grabado. Suele activarse durante la conferencia.</p></div>
-      <div class="card"><span class="tag">Cierre</span><h3 style="margin-top:12px">Reporte COMET</h3><p>Antes del COMET, los tres oficiales se reúnen para reportar incidencias por área: filmación de vestuarios, llegadas, protocolo de inicio, Flash, conferencia y Zona Mixta.</p></div>
+      <div class="card"><img class="card-ph" src="photos/vestuario.jpg" alt="" loading="lazy"><span class="tag">Previa</span><h3 style="margin-top:12px">Filmación de vestuarios</h3><p>Solo HB y Digital CONMEBOL, antes de que lleguen los jugadores y en el horario de la reunión de coordinación. El CVM garantiza el vestuario limpio y con productos del patrocinador. Prohibida la presencia de RH; la HB entrega el material.</p></div>
+      <div class="card"><img class="card-ph" src="photos/llegada.jpg" alt="" loading="lazy"><span class="tag">Previa</span><h3 style="margin-top:12px">Llegada de los equipos</h3><p>La HB registra desde el ómnibus hasta el ingreso a vestuarios (≈10 min entre llegadas). El CVM lleva el backdrop al punto acordado; el BVM y el OSC aseguran una toma limpia. Las TV y redes de clubes graban siempre detrás de la HB.</p></div>
+      <div class="card"><img class="card-ph" src="photos/entrevista.jpg" alt="" loading="lazy"><span class="tag">Previa</span><h3 style="margin-top:12px">Entrevista DT y jugador</h3><p>En la llegada, solo por la HB, tras el ingreso a vestuarios. Máximo 3 minutos, backdrop obligatorio. El BVM chequea posición, micrófono, iluminación y sonido; avisa al OMC para traer al DT y al jugador.</p></div>
+      <div class="card"><img class="card-ph" src="photos/camaras.jpg" alt="" loading="lazy"><span class="tag">Partido</span><h3 style="margin-top:12px">Protocolo de inicio</h3><p>Se cumple la cuenta regresiva tal cual. El BVM ensaya con HB y CVM pórtico, portapelota y carteles, y coordina la marcación de árbitros y el sorteo con el delegado. El OMC lleva la operación de cuerda.</p></div>
+      <div class="card"><img class="card-ph" src="photos/flash.jpg" alt="" loading="lazy"><span class="tag">Post</span><h3 style="margin-top:12px">Flash Interview</h3><p>Inmediatamente al final: la HB primero, luego los RH (hasta 3 jugadores por equipo, 60 s cada uno). Backdrop obligatorio y reportero fuera de plano. El BVM organiza prioridades; el CVM entrega el BOTM.</p></div>
+      <div class="card"><img class="card-ph" src="photos/conferencia.jpg" alt="" loading="lazy"><span class="tag">Post</span><h3 style="margin-top:12px">Conferencia de prensa</h3><p>Máx. 15‑20 min tras el partido, con DT y un jugador. Orden: visitante y luego local. El OMC chequea la sala con el club; el CVM, el backdrop y que el espacio esté libre de marcas.</p></div>
+      <div class="card"><img class="card-ph" src="photos/zona-mixta.jpg" alt="" loading="lazy"><span class="tag">Post</span><h3 style="margin-top:12px">Zona Mixta</h3><p>Dividida en TV (RH y NHR, con backdrop) y prensa escrita / radios. Prioridad <em>first come, first served</em>, siempre con prioridad RH. Los NHR no hacen vivo: todo su material es grabado. Suele activarse durante la conferencia.</p></div>
+      <div class="card"><img class="card-ph" src="photos/reunion.jpg" alt="" loading="lazy"><span class="tag">Cierre</span><h3 style="margin-top:12px">Reporte COMET</h3><p>Antes del COMET, los tres oficiales se reúnen para reportar incidencias por área: filmación de vestuarios, llegadas, protocolo de inicio, Flash, conferencia y Zona Mixta.</p></div>
     </div>
 
     <div class="lead-row" style="margin-top:38px">
@@ -627,6 +651,22 @@
 <script>
 (function(){
   "use strict";
+  /* intro loader + HUD clock */
+  (function(){
+    var el=document.getElementById("loader");
+    if(el){
+      var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches, seen;
+      try{seen=sessionStorage.getItem("fbf-intro")}catch(e){}
+      if(seen||reduce){ if(el.parentNode)el.parentNode.removeChild(el); }
+      else{
+        try{sessionStorage.setItem("fbf-intro","1")}catch(e){}
+        var fill=document.getElementById("loaderFill"),pct=document.getElementById("loaderPct"),p=0;
+        var t=setInterval(function(){p+=Math.random()*14+6;if(p>=100){p=100;clearInterval(t);setTimeout(function(){el.classList.add("done");setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},620)},250)}if(fill)fill.style.width=p+"%";if(pct)pct.textContent=Math.round(p)+"%"},90);
+      }
+    }
+    var ck=document.getElementById("hudClock");
+    if(ck){var z=function(n){return(n<10?"0":"")+n};var tick=function(){var d=new Date();ck.textContent=z(d.getHours())+":"+z(d.getMinutes())+":"+z(d.getSeconds())};tick();setInterval(tick,1000);}
+  })();
   var TOTAL=100, pad=function(n){return String(n).padStart(3,"0")}, src=function(n){return "slides/slide-"+pad(n)+".webp"}, thumbSrc=function(n){return "slides/thumb/slide-"+pad(n)+".webp"};
 
   var MODULES=[
